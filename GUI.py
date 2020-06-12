@@ -11,6 +11,7 @@ import re
 from voiceComposeByUrl import compose
 import logging
 import datetime
+import json
 
 logging.basicConfig(
     level=logging.DEBUG,#控制台打印的日志级别
@@ -61,10 +62,10 @@ voice_json = {
 
 class MainUi(QtWidgets.QMainWindow):
     __dragWin = True
-    def __init__(self, windowTitle="配音助手"):
+    def __init__(self):
         super().__init__()
         QtWidgets.QMainWindow.__init__(self, windowTitle="配音助手")
-        QtWidgets.QMainWindow.setWindowIcon(self, QIcon('./voiceAssistant.jpg'))
+        QtWidgets.QMainWindow.setWindowIcon(self, QIcon('./assets/voiceAssistant.jpg'))
         self.__dragWin = False
         self.init_ui()
 
@@ -97,7 +98,8 @@ class MainUi(QtWidgets.QMainWindow):
 
     def get_now_time(self):
         now = datetime.datetime.now()
-        time = str(now.year) + '_' + str(now.month) + '_' + str(now.day) + '_'
+        time = 'AUDIO_' + str(now.year) + str(now.month) + str(now.day) + '_' \
+               + str(now.hour) + str(now.minute) + str(now.second) + '_'
         return time
 
     def open_test_voice_url(self):
@@ -170,28 +172,25 @@ class MainUi(QtWidgets.QMainWindow):
                     result_volume = self.check_format(volume, 'volume')
                     if result_volume == 'success':
                         volume = int(volume)
-                        file_name = self.right_bar_widget_filename_input.text()
-                        if file_name != '':
-                            text = self.right_bar_widget_text_input.toPlainText()
-                            if len(text) > 0:
-                                format = self.right_bar_widget_format_input.currentText()
-                                voice = self.right_bar_widget_voice_input.currentText()
-                                logging.info('appkey =', appkey)
-                                logging.info('token =', token)
-                                logging.info('speech_rate =', speech_rate)
-                                logging.info('volume =', volume)
-                                logging.info('file_name =', file_name)
-                                logging.info('text =', text)
-                                logging.info('format =', format)
-                                logging.info('voice =', voice, voice_json[voice])
-                                logging.info('参数填写完毕')
-
-                                self.compose_voice_(appkey, token, voice_json[voice], speech_rate, format, volume, file_name, text)
-                            else:
-                                msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写文本!')
-                                msg_box.exec_()
+                        file_name = self.get_now_time()
+                        text = self.right_bar_widget_text_input.toPlainText()
+                        if len(text) > 0:
+                            format = self.right_bar_widget_format_input.currentText()
+                            voice = self.right_bar_widget_voice_input.currentText()
+                            logging.info('appkey = ' + appkey)
+                            logging.info('token = ' + token)
+                            logging.info('speech_rate = ' + str(speech_rate))
+                            logging.info('volume = ' + str(volume))
+                            logging.info('file_name = ' + file_name)
+                            logging.info('text = ' + text)
+                            logging.info('format = ' + format)
+                            logging.info('voice = ' + voice + '__' + voice_json[voice])
+                            logging.info('参数填写完毕')
+                            self.write_voice_info_json(appkey, token, speech_rate, volume, format, voice)
+                            logging.info('写入json文件信息成功')
+                            self.compose_voice_(appkey, token, voice_json[voice], speech_rate, format, volume, file_name, text)
                         else:
-                            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写文件名!')
+                            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写文本!')
                             msg_box.exec_()
                     else:
                         msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', result_volume)
@@ -266,6 +265,43 @@ class MainUi(QtWidgets.QMainWindow):
         if not os.path.exists('./audioFiles'):
             os.makedirs('./audioFiles')
         QDesktopServices.openUrl(QUrl('file:///' + os.getcwd() + '/audioFiles'))
+
+
+    def get_last_voice_info(self):
+        if not os.path.exists('./voice_data.json'):
+            logging.info('首次进行语音合成无json信息文件')
+        else:
+            data = json.load(open("./voice_data.json"))
+            appkey = data['appkey']
+            self.right_bar_widget_appkey_input.setText(appkey)
+            token = data['token']
+            self.right_bar_widget_token_input.setText(token)
+            speech_rate = data['speech_rate']
+            self.right_bar_widget_speech_rate_input.setText(str(speech_rate))
+            volume = data['volume']
+            self.right_bar_widget_volume_input.setText(str(volume))
+            format = data['format']
+            self.right_bar_widget_format_input.setCurrentText(format)
+            voice = data['voice']
+            self.right_bar_widget_voice_input.setCurrentText(voice)
+
+            logging.info('读取json语音合成历史信息成功')
+
+
+    def write_voice_info_json(self, appkey, token, speech_rate, volume, format, voice):
+        compose_info = {}
+        data = json.loads(json.dumps(compose_info))
+        data['appkey'] = appkey
+        data['token'] = token
+        data['speech_rate'] = speech_rate
+        data['volume'] = volume
+        data['format'] = format
+        data['voice'] = voice
+        compose_info = json.dumps(data, indent=4, ensure_ascii=False)
+
+        # print(compose_info)
+        with open('./voice_data.json', 'w') as json_file:
+            json_file.write(compose_info)
 
 
     def init_ui(self):
@@ -443,13 +479,8 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_arg42_layout = QtWidgets.QGridLayout()
         self.right_arg42_widget.setLayout(self.right_arg42_layout)
 
-        self.filename_icon = QtWidgets.QLabel('文件名称')
-        self.filename_icon.setFont(qtawesome.font('fa', 16))
-        self.right_bar_widget_filename_input = QtWidgets.QLineEdit()
-        self.right_bar_widget_filename_input.setPlaceholderText("保存文件名称")
-        self.right_bar_widget_filename_input.setText('audio_' + self.get_now_time())
 
-        self.voice_icon = QtWidgets.QLabel('           音色')
+        self.voice_icon = QtWidgets.QLabel('音色')
         self.voice_icon.setFont(qtawesome.font('fa', 16))
         self.right_bar_widget_voice_input = QtWidgets.QComboBox(self)
         self.right_bar_widget_voice_input.addItems(['艾夏','小云', '小刚', '若兮', '思琪', '思佳', '思诚', '艾琪', '艾佳', '艾诚', '艾达', '宁儿', '瑞琳', '思悦', '艾雅',  '艾美', '艾雨', '艾悦', '艾婧', '小美', '艾娜', '伊娜', '思婧', '思彤', '小北', '艾彤', '艾薇', '艾宝', '姗姗', '小玥', 'Lydia', '艾硕', '青青', '翠姐', '小泽'])
@@ -464,12 +495,10 @@ class MainUi(QtWidgets.QMainWindow):
 
 
 
-        self.right_arg41_layout.addWidget(self.filename_icon, 4, 0, 1, 1)
-        self.right_arg41_layout.addWidget(self.right_bar_widget_filename_input, 4, 1, 1, 2)
-        self.right_arg42_layout.addWidget(self.voice_icon, 4, 3, 1, 1)
-        self.right_arg42_layout.addWidget(self.right_bar_widget_voice_input, 4, 4, 1, 2)
-        self.right_arg42_layout.addWidget(self.test_voice_button, 4, 6, 1, 2)
-        self.right_arg42_layout.addWidget(self.compose_voice_button, 4, 8, 1, 2)
+        self.right_arg41_layout.addWidget(self.voice_icon, 4, 0, 1, 1)
+        self.right_arg41_layout.addWidget(self.right_bar_widget_voice_input, 4, 1, 1, 2)
+        self.right_arg42_layout.addWidget(self.test_voice_button, 4, 3, 1, 2)
+        self.right_arg42_layout.addWidget(self.compose_voice_button, 4, 5, 1, 2)
         self.right_arg4_layout.addWidget(self.right_arg41_widget, 4, 0, 1, 3)
         self.right_arg4_layout.addWidget(self.right_arg42_widget, 4, 3, 1, 9)
         self.right_layout.addWidget(self.right_arg4_widget, 4, 0, 1, 9)
@@ -488,14 +517,20 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_widget_shuoming.setVisible(False)
 
         self.main_layout.addWidget(self.right_widget_shuoming, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
-        self.shuoming_text = QtWidgets.QLabel('1、打开网址：https://zhuanlan.zhihu.com/p/123930042；\n'
-                                              '2、按照文章中提示注册登录阿里云，获得智能语音交互的appkey和token(会过期)；\n'
-                                              '3、在语音合成中，输入相应的参数，即可进行语音合成，进行配音；\n'
-                                              '4、输入文本中目前支持中文进行配音，且必须有句号等标点符号，\n      本程序利用句号才进行分割，所以请按规范输入文本；\n'
-                                              '5、音色选择可以在点击配音试听，到阿里云官网选择你需要的配音音色；\n'
-                                              '6、语音合成的速度：300字符以内（5秒），600字符（15秒左右）,请耐心等待；\n'
-                                              '7、合成音频在当前目录audioFiles中')
+        self.shuoming_text = QtWidgets.QLabel('1、打开网址：<a href="https://zhuanlan.zhihu.com/p/123930042" style="color:blue">https://zhuanlan.zhihu.com/p/123930042</a><br>'
+                                              '2、按照文章中提示注册登录阿里云，获得智能语音交互的appkey和token(会过期)<br>'
+                                              '3、在语音合成中，输入相应的参数，即可进行语音合成，进行配音<br>'
+                                              '4、输入文本中目前支持中文进行配音，且必须有句号等标点符号，<br>      本程序利用句号“。”才进行分割，所以请按规范输入文本<br>'
+                                              '5、音色选择可以在点击配音试听，到阿里云官网选择你需要的配音音色<br>'
+                                              '6、语音合成的速度：300字符以内（10秒），800字符（25秒左右）,请耐心等待<br>'
+                                              '7、当前语音合成并发数为2（免费版最大并发数），普通使用者足够<br>'
+                                              '8、合成音频在当前目录audioFiles中,文件名称为"日期.mp3"<br>'
+                                              '9、根据字符长度讲每段字符数限制在300内进行合成，若有800字，则可能生成3个音频文件<br>'
+                                              '9、目录下会生成日志文件：“日志.log”<br>'
+                                              '10、目录下生成音频合成信息文件：“voice_data.json”，记录上次合成信息<br>')
         self.shuoming_text.setObjectName('shuoming_text_lable')
+        self.shuoming_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.shuoming_text.setOpenExternalLinks(True)
         self.right_layout_shuoming.addWidget(self.shuoming_text, 0, 0, 12, 10)
 
 
@@ -519,11 +554,13 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_widget_fankui.setVisible(False)
 
         self.main_layout.addWidget(self.right_widget_fankui, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
-        self.fankui_text = QtWidgets.QLabel('1、发送邮件至：nh4l@qq.com \n'
-                                            '2、发送邮件至：nh4ly@outlook.com\n'
-                                            '3、知乎 @NH4L私信  https://www.zhihu.com/people/NH4L\n'
-                                            '4、CSDN @NH4L博客私信 https://blog.csdn.net/LeeGe666\n')
+        self.fankui_text = QtWidgets.QLabel('1、发送邮件至 : nh4l@qq.com <br>' +
+                                            '2、发送邮件至 : nh4ly@outlook.com<br>' +
+                                            '3、知乎 @NH4L私信 : <a href="https://www.zhihu.com/people/NH4L/posts" style="color:blue">https://www.zhihu.com/people/NH4L</a><br>' +
+                                            '4、CSDN @NH4L博客私信 : <a href="https://blog.csdn.net/LeeGe666" style="color:blue">https://blog.csdn.net/LeeGe666</a><br>')
         self.fankui_text.setObjectName('fankui_text_lable')
+        self.fankui_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.fankui_text.setOpenExternalLinks(True)
         self.right_layout_fankui.addWidget(self.fankui_text, 0, 0, 12, 10)
 
 
@@ -534,14 +571,16 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_widget_guanyu.setVisible(False)
 
         self.main_layout.addWidget(self.right_widget_guanyu, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
-        self.guanyu_text = QtWidgets.QLabel('1、本人是一位大学生, 计算机科学与技术专业，\n     对软件开发，机器学习，大数据有较大兴趣；\n'
-                                            '2、如需和我交流 +qq：2283373978\n'
-                                            '                           +微信：nh4lan\n'
-                                            '3、本软件调用阿里云免费语音合成接口，利用阿里云的API薅羊毛，\n      不读取用户任何信息，请放心使用\n'
-                                            '4、本软件完全开源 github： https://github.com/NH4L/voiceAssistant \n'
-                                            '5、我的CSDN博客 @NH4L https://blog.csdn.net/LeeGe666 \n'
+        self.guanyu_text = QtWidgets.QLabel('1、本人是一位大学生, 计算机科学与技术专业，<br>     对软件开发，机器学习，大数据有较大兴趣；<br>'
+                                            '2、如需和我交流 +qq：2283373978<br>'
+                                            '                           +微信：nh4lan<br>'
+                                            '3、本软件调用阿里云免费语音合成接口，利用阿里云的API薅羊毛，<br>      不读取用户任何信息，请放心使用<br>'
+                                            '4、本软件完全开源 github @NH4L  <a href="https://github.com/NH4L/voiceAssistant" style="color:blue">https://github.com/NH4L/voiceAssistant</a> <br>'
+                                            '5、我的CSDN博客 @NH4L <a href="https://blog.csdn.net/LeeGe666" style="color:blue">https://blog.csdn.net/LeeGe666</a> <br>'
                                             '                           @Copyright NH4L All Rights Reserved')
         self.guanyu_text.setObjectName('guanyu_text_lable')
+        self.guanyu_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.guanyu_text.setOpenExternalLinks(True)
         self.right_layout_guanyu.addWidget(self.guanyu_text, 0, 0, 12, 10)
 
         self.right_widget_wenti = QtWidgets.QWidget()  # 创建右侧部件
@@ -551,24 +590,27 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_widget_wenti.setVisible(False)
 
         self.main_layout.addWidget(self.right_widget_wenti, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
-        self.wenti_text = QtWidgets.QLabel('1、有问题联系   +qq：2283373978\n'
-                                            '                          +微信：nh4lan\n'
-                                            '2、知乎私信：https://www.zhihu.com/people/NH4L \n'
-                                            '3、CSDN博客私信: @NH4L https://blog.csdn.net/LeeGe666')
+        self.wenti_text = QtWidgets.QLabel('1、有问题联系   +qq：2283373978<br>'
+                                            '                          +微信：nh4lan<br>'
+                                            '2、知乎私信 @NH4L <a href="https://www.zhihu.com/people/NH4L/posts" style="color:blue">https://www.zhihu.com/people/NH4L</a> <br>'
+                                            '3、CSDN博客私信 @NH4L <a href="https://blog.csdn.net/LeeGe666" style="color:blue">https://blog.csdn.net/LeeGe666</a> <br>')
         self.wenti_text.setObjectName('wenti_text_lable')
+        self.wenti_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.wenti_text.setOpenExternalLinks(True)
         self.right_layout_wenti.addWidget(self.wenti_text, 0, 0, 12, 10)
 
 
         self.setCentralWidget(self.main_widget) # 设置窗口主部件
 
+        self.get_last_voice_info()
 
 
         self.left_close.setStyleSheet(
-            '''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
+            '''QPushButton{background:#F76677 url(./assets/exit.png) no-repeat;border-radius:5px;}QPushButton:hover{background:red url(./assets/exit.png);}''')
         self.left_visit.setStyleSheet(
-            '''QPushButton{background:#F7D674;border-radius:5px;}QPushButton:hover{background:yellow;}''')
+            '''QPushButton{background:#F7D674 url(./assets/max.png) no-repeat;border-radius:5px;}QPushButton:hover{background:yellow  url(./assets/max.png);}''')
         self.left_mini.setStyleSheet(
-            '''QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}''')
+            '''QPushButton{background:#6DDF6D url(./assets/min.png) no-repeat;border-radius:5px;}QPushButton:hover{background:green  url(./assets/min.png);}''')
 
         self.left_widget.setStyleSheet('''
           QPushButton{border:none;color:white;}
@@ -707,13 +749,7 @@ class MainUi(QtWidgets.QMainWindow):
                 border-radius:10px;
                 padding:2px 4px;
             }''')
-        self.right_bar_widget_filename_input.setStyleSheet(
-            '''QLineEdit{
-                border:1px solid gray;
-                width:75px;
-                border-radius:10px;
-                padding:2px 4px;
-            }''')
+
         self.test_voice_button.setStyleSheet(
             '''QPushButton{
                     background:#1C86EE;border-radius:6px;
