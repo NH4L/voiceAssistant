@@ -1,4 +1,6 @@
 # encoding:utf-8
+import time
+
 import requests
 from requests.exceptions import RequestException
 import urllib.parse
@@ -6,6 +8,8 @@ import urllib.request
 import re
 import os
 import logging
+import threading
+
 logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
                     filename='日志.log',
                     filemode='a',
@@ -15,24 +19,48 @@ logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
 headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"}
 
 
-def request_url(url, name):
+class compose_thread(threading.Thread):
+
+    def __init__(self, name, list, appkey, token, voice, speech_rate, format, volume, file_name):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.list = list
+        self.appkey = appkey
+        self.token = token
+        self.voice = voice
+        self.speech_rate = speech_rate
+        self.format = format
+        self.volume = volume
+        self.file_name = file_name
+
+
+    def run(self):
+        print("%s is running" % self.name)
+        for id in range(len(self.list) - 1):
+            time.sleep(0.5)
+            print(id + self.list[-1])
+            get_voice(self.appkey, self.token, self.voice, self.speech_rate, self.format, self.volume, self.file_name, urllib.parse.quote(self.list[id]), id + self.list[-1])
+
+
+
+def request_url(url, name, format):
     response = requests.get(url, headers=headers)
-    logging.info('状态码: ' ,response.status_code)
+    logging.info('状态码: ' + str(response.status_code))
     try:
         if response.status_code == 200:
-            download_voice(url, name)
+            download_voice(url, name, format)
         return None
     except RequestException:
         return None
 
 
-def download_voice(url, name):
+def download_voice(url, name, format):
     if not os.path.exists('./audioFiles'):
         os.makedirs('./audioFiles')
-    file_path = r'./audioFiles/{}.mp3'.format(name)
-    logging.info('正在下载:', name, '.mp3\n')
+    file_path = r'./audioFiles/{}.{}'.format(name, format)
+    logging.info('正在下载:' + name + '.{}\n'.format(format))
     urllib.request.urlretrieve(url, file_path)
-    logging.info(name, '.mp3下载完成!!!!!!!!!')
+    logging.info(name + '.{}下载完成!!!!!!!!!'.format(format))
 
 
 def not_empty(s):
@@ -83,7 +111,7 @@ def get_voice(appkey, token, voice, speech_rate, format, volume, file_name, text
     url = 'https://nls-gateway.cn-shanghai.aliyuncs.com/stream/v1/tts?appkey=' + appkey \
           + '&token=' + token + '&format=' + format + '&voice=' + voice + '&speech_rate=' + \
           str(speech_rate) + '&volume=' + str(volume) + '&text=' + text
-    request_url(url, file_name + str(id))
+    request_url(url, file_name + str(id), format)
 
 
 def get_network():
@@ -107,8 +135,24 @@ def compose(appkey, token, voice, speech_rate, format, volume, file_name, text):
             else:
                 text_array = cut_text(text, 300)
                 # print(text_array)
-                for id in range(len(text_array)):
-                    get_voice(appkey, token, voice, speech_rate, format, volume, file_name, urllib.parse.quote(text_array[id]), id)
+                # for id in range(len(text_array)):
+                #     print(id)
+                #     print(text_array)
+                list1 = text_array[:int(len(text_array) / 2)]
+                list1.append(0)
+                list2 = text_array[int(len(text_array) / 2):]
+                list2.append(len(list1) - 1)
+                thread_list1 = compose_thread('thread1', list1, appkey, token, voice, speech_rate, format, volume, file_name)
+                thread_list2 = compose_thread('thread2', list2, appkey, token, voice, speech_rate, format, volume, file_name)
+
+                thread_list1.start()
+                thread_list2.start()
+                thread_list1.join()
+                thread_list2.join()
+
+
+
+                    # get_voice(appkey, token, voice, speech_rate, format, volume, file_name, urllib.parse.quote(text_array[id]), id)
             return 'success'
         else:
             return 'token expired'
@@ -120,7 +164,7 @@ def compose(appkey, token, voice, speech_rate, format, volume, file_name, text):
 if __name__ == '__main__':
     voice = 'Aixia'
     appkey = 'VNSQETOK5RRVSeRH'
-    token = '0f3947bec58446c581dc46544bb3224e'
+    token = '5ed6c3da81644f6cbd16927679ef3a85'
     speech_rate = -200
     format = 'mp3'
     volume = 100
