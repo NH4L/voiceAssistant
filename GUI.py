@@ -12,6 +12,8 @@ from voiceComposeByUrl import compose
 import logging
 import datetime
 import json
+from PyQt5.QtCore import QThread, pyqtSignal
+from functools import partial
 
 logging.basicConfig(
     level=logging.DEBUG,#控制台打印的日志级别
@@ -60,6 +62,17 @@ voice_json = {
 }
 
 
+class message(QThread):
+    signal = pyqtSignal()
+
+    def __init__(self, Window):
+        super(message, self).__init__()
+        self.window = Window
+
+    def run(self):
+        self.signal.emit()
+
+
 class MainUi(QtWidgets.QMainWindow):
     __dragWin = True
     def __init__(self):
@@ -91,7 +104,6 @@ class MainUi(QtWidgets.QMainWindow):
             self.showNormal()
         else:
             self.showMaximized()
-
 
     def print_value(self, select_value):
         return select_value
@@ -134,21 +146,26 @@ class MainUi(QtWidgets.QMainWindow):
             if 'volume' == type:
                     return '音量不能为空！'
 
+
     def compose_voice_(self, appkey, token, voice, speech_rate, format, volume, file_name, text):
         res = compose(appkey, token, voice, speech_rate, format, volume, file_name, text)
         logging.info(res)
         if res == 'network fail':
-            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未连接网络，请连接后重试!')
-            msg_box.exec_()
+            self.message = message(self)
+            self.message.signal.connect(partial(self.warning_box_kong, '未连接网络，请连接后重试'))
+            self.message.start()
             logging.warning('网络未连接')
         elif res == 'token expired':
-            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', 'token过期,请重新到阿里云粘贴token后充重试!')
-            msg_box.exec_()
+            self.message = message(self)
+            self.message.signal.connect(partial(self.warning_box_kong, 'token过期,请重新到阿里云粘贴token后充重试'))
+            self.message.start()
             logging.warning('token过期')
         elif res == 'success':
-            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, '提示', '音频合成成功!')
-            msg_box.exec_()
+            self.message = message(self)
+            self.message.signal.connect(partial(self.warning_box_kong, '音频合成成功'))
+            self.message.start()
             logging.info('音频合成成功')
+
 
 
     def start_compose(self):
@@ -158,8 +175,16 @@ class MainUi(QtWidgets.QMainWindow):
         self.thread.start()
 
 
+    def warning_box(self, text):
+        QtWidgets.QMessageBox.warning(self, 'Warning', "未填写{0}！".format(text))
+
+    def warning_box_kong(self, text):
+        QtWidgets.QMessageBox.warning(self, 'Warning', "{0}！".format(text))
+
+
     def compose(self):
         self.compose_voice_button.setEnabled(False)
+
         appkey = self.right_bar_widget_appkey_input.text()
         if appkey != '':
             token = self.right_bar_widget_token_input.text()
@@ -190,20 +215,26 @@ class MainUi(QtWidgets.QMainWindow):
                             logging.info('写入json文件信息成功')
                             self.compose_voice_(appkey, token, voice_json[voice], speech_rate, format, volume, file_name, text)
                         else:
-                            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写文本!')
-                            msg_box.exec_()
+                            self.message = message(self)
+                            self.message.signal.connect(partial(self.warning_box, '文本'))
+                            self.message.start()
+
                     else:
-                        msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', result_volume)
-                        msg_box.exec_()
+                        self.message = message(self)
+                        self.message.signal.connect(partial(self.warning_box_kong, result_volume))
+                        self.message.start()
                 else:
-                    msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', result_speech_rate)
-                    msg_box.exec_()
+                    self.message = message(self)
+                    self.message.signal.connect(partial(self.warning_box_kong, result_speech_rate))
+                    self.message.start()
             else:
-                msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写token!')
-                msg_box.exec_()
+                self.message = message(self)
+                self.message.signal.connect(partial(self.warning_box, 'token'))
+                self.message.start()
         else:
-            msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 'Warning', '未填写appkey!')
-            msg_box.exec_()
+            self.message = message(self)
+            self.message.signal.connect(partial(self.warning_box, 'appkey'))
+            self.message.start()
         self.compose_voice_button.setEnabled(True)
 
 
