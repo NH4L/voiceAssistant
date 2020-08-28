@@ -58,7 +58,14 @@ voice_json = {
     "艾硕": "Aishuo",
     "青青": "Qingqing",
     "翠姐": "Cuijie",
-    "小泽": "Xiaoze"
+    "小泽": "Xiaoze",
+    "艾媛(商用)": "Aiyuan",
+    "艾颖(商用)": "Aiying",
+    "艾祥(商用)": "Aixiang",
+    "艾墨(商用)": "Aimo",
+    "艾晔(商用)": "Aiye",
+    "艾婷(商用)": "Aiting",
+    "艾凡(商用)": "Aifan"
 }
 
 
@@ -111,7 +118,7 @@ class MainUi(QtWidgets.QMainWindow):
     def get_now_time(self):
         now = datetime.datetime.now()
         time = 'AUDIO_' + str(now.year) + str(now.month) + str(now.day) + '_' \
-               + str(now.hour) + str(now.minute) + str(now.second) + '_'
+               + str(now.hour) + str(now.minute) + str(now.second) + '__'
         return time
 
     def open_test_voice_url(self):
@@ -125,7 +132,7 @@ class MainUi(QtWidgets.QMainWindow):
         if str != '':
             reg = re.compile(r'^-?[1-9]+[0-9]*$')  # 定义正则表达式
             result = reg.match(str)
-            if result:
+            if result or str == "0":
                 result = int(str)
                 if 'speech_rate' == type:
                     if result >= -500 and result <= 500:
@@ -514,7 +521,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.voice_icon = QtWidgets.QLabel('音色')
         self.voice_icon.setFont(qtawesome.font('fa', 16))
         self.right_bar_widget_voice_input = QtWidgets.QComboBox(self)
-        self.right_bar_widget_voice_input.addItems(['艾夏','小云', '小刚', '若兮', '思琪', '思佳', '思诚', '艾琪', '艾佳', '艾诚', '艾达', '宁儿', '瑞琳', '思悦', '艾雅',  '艾美', '艾雨', '艾悦', '艾婧', '小美', '艾娜', '伊娜', '思婧', '思彤', '小北', '艾彤', '艾薇', '艾宝', '姗姗', '小玥', 'Lydia', '艾硕', '青青', '翠姐', '小泽'])
+        self.right_bar_widget_voice_input.addItems(['小云', '小刚', '若兮', '思琪', '思佳', '思诚', '艾夏', '艾琪', '艾佳', '艾诚', '艾达', '宁儿', '瑞琳', '思悦', '艾雅',  '艾美', '艾雨', '艾悦', '艾婧', '小美', '艾娜', '伊娜', '思婧', '思彤', '小北', '艾彤', '艾薇', '艾宝', '姗姗', '小玥', 'Lydia', '艾硕', '青青', '翠姐', '小泽', '艾媛(商用)', '艾颖(商用)', '艾祥(商用)', '艾墨(商用)', '艾晔(商用)', '艾婷(商用)', '艾凡(商用)'])
         self.test_voice_button = QtWidgets.QPushButton('配音试听')
         self.test_voice_button.setFont(qtawesome.font('fa', 16))
         self.test_voice_button.clicked.connect(self.open_test_voice_url)
