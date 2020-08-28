@@ -1,8 +1,8 @@
 {
-    "speech_rate": -100,
-    "appkey": "VNSQETOK5RRVSeRH",
-    "token": "b52a92631f7542869ffb73522ad9570a",
     "volume": 100,
-    "voice": "°¬ÏÄ",
-    "format": "mp3"
+    "format": "wav",
+    "speech_rate": 0,
+    "token": "d1856e33bc2d4eeb8486111ead398e26",
+    "appkey": "VNSQETOK5RRVSeRH",
+    "voice": "°¬ÏÄ"
 }
