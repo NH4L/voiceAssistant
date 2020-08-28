@@ -8,16 +8,13 @@ import urllib.request
 import re
 import logging
 import threading
-import ali_speech
+
 from compose_long import compose_commercial_long, request_url
 
 headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"}
 
 
 voice_commercial = ["Aiyuan", "Aiying", "Aixiang", "Aimo", "Aiye", "Aiting", "Aifan"]
-client = ali_speech.NlsClient()
-# 设置输出日志信息的级别：DEBUG、INFO、WARNING、ERROR
-client.set_log_level('INFO')
 
 logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
                     filename='日志.log',
@@ -117,7 +114,10 @@ def compose(appkey, token, voice, speech_rate, format, volume, file_name, text):
         if res != 400:
             if voice in voice_commercial:
                 logging.info('商用版')
-                compose_commercial_long(appkey, token, voice, speech_rate, format, volume, file_name, text)
+                if compose_commercial_long(appkey, token, voice, speech_rate, format, volume, file_name, text):
+                    return "success"
+                else:
+                    return "not commercial"
             else:
                 if len(text) < 300:
                     get_voice(appkey, token, voice, speech_rate, format, volume, file_name, urllib.parse.quote(text), 0)
@@ -136,10 +136,8 @@ def compose(appkey, token, voice, speech_rate, format, volume, file_name, text):
                     thread_list1.join()
                     thread_list2.join()
 
-
-
                     # get_voice(appkey, token, voice, speech_rate, format, volume, file_name, urllib.parse.quote(text_array[id]), id)
-            return 'success'
+                return 'success'
         else:
             return 'token expired'
 
