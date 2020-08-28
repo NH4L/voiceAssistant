@@ -167,6 +167,11 @@ class MainUi(QtWidgets.QMainWindow):
             self.message.signal.connect(partial(self.warning_box_kong, 'token过期,请重新到阿里云粘贴token后充重试'))
             self.message.start()
             logging.warning('token过期')
+        elif res == 'not commercial':
+            self.message = message(self)
+            self.message.signal.connect(partial(self.warning_box_kong, '未开通长文本语音合成商用，请开通后后使用！（非免费）'))
+            self.message.start()
+            logging.warning('未开通商用')
         elif res == 'success':
             self.message = message(self)
             self.message.signal.connect(partial(self.warning_box_kong, '音频合成成功'))
@@ -561,11 +566,12 @@ class MainUi(QtWidgets.QMainWindow):
                                               '4、输入文本中目前支持中文进行配音，且必须有句号等标点符号，<br>      本程序利用句号“。”才进行分割，所以请按规范输入文本<br>'
                                               '5、音色选择可以在点击配音试听，到阿里云官网选择你需要的配音音色<br>'
                                               '6、语音合成的速度：300字符以内（10秒），800字符（25秒左右）,请耐心等待<br>'
-                                              '7、当前语音合成并发数为2（免费版最大并发数），普通使用者足够<br>'
+                                              '7、免费音色当前语音合成并发数为2（免费版最大并发数），普通使用者足够<br>'
                                               '8、合成音频在当前目录audioFiles中,文件名称为"日期.mp3"<br>'
                                               '9、根据字符长度讲每段字符数限制在300内进行合成，若有800字，则可能生成3个音频文件<br>'
                                               '9、目录下会生成日志文件：“日志.log”<br>'
-                                              '10、目录下生成音频合成信息文件：“voice_data.json”，记录上次合成信息<br>')
+                                              '10、目录下生成音频合成信息文件：“voice_data.json”，记录上次合成信息<br>'
+                                              '11、商用音色（已备注）请查看更新文章，请开通后使用，未开通则不能使用，<br>文学类音色为长文本语音合成特有音色，且为商用，使用须向阿里云缴费！')
         self.shuoming_text.setObjectName('shuoming_text_lable')
         self.shuoming_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.shuoming_text.setOpenExternalLinks(True)
