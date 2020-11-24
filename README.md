@@ -1,21 +1,29 @@
-@[TOC]([配音助手] 更新（1.3） 阿里云小姐姐配音软件)
+@NH4L
+#[配音助手] 更新（1.3） 阿里云小姐姐配音软件
 
 >推荐系统：windows10/7
+
 >推荐系统类型：64位操作系统
+
 >推荐使用人群：视频制作者，配音制作者
 
 使用前请先查看软件（**配音助手1.0**）介绍：
 csdn: [https://blog.csdn.net/LeeGe666/article/details/106604378](https://blog.csdn.net/LeeGe666/article/details/106604378)
+
 知乎：[https://zhuanlan.zhihu.com/p/146489438](https://zhuanlan.zhihu.com/p/146489438)
 
 **配音助手下载地址**：
 [蓝奏云 配音助手1.3.zip](https://nh4l.lanzous.com/iZVDSg5kccf)
+
 [微云   配音助手1.3.zip](https://share.weiyun.com/kddB9ikC)
+
 [自建服务器 配音助手1.3.zip](https://www.aysst.cn/files/%E9%85%8D%E9%9F%B3%E5%8A%A9%E6%89%8B1.3.zip)
 
 >**声明**
 >本软件只适用于配音者，视频制作者
+
 >不适用于超大规模（10万字以上）超长文本配音
+
 >本软件完全开源并免费，商用产生费用为阿里云根据合成字数及时长产生，和本软件无关
 >
 
@@ -24,8 +32,7 @@ csdn: [https://blog.csdn.net/LeeGe666/article/details/106604378](https://blog.cs
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828205558298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
 所加音色为**长文本语音合成商用**！非商用音色免费！
 具体价格细节可查看阿里云
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828205812909.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
-
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2020112413005631.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
 下面介绍如果开通商用：
 进入**智能语音交互控制台**
 选择长文本语音合成（文学类为商用，音色只能应用于长文本）
