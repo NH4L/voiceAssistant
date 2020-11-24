@@ -1,20 +1,46 @@
-@[TOC]([配音助手] 更新（1.2） 阿里云小姐姐配音软件)
+@[TOC]([配音助手] 更新（1.3） 阿里云小姐姐配音软件)
 
 >推荐系统：windows10/7
 >推荐系统类型：64位操作系统
 >推荐使用人群：视频制作者，配音制作者
 
-使用前请先查看软件（配音助手1.0）介绍：
+使用前请先查看软件（**配音助手1.0**）介绍：
 csdn: [https://blog.csdn.net/LeeGe666/article/details/106604378](https://blog.csdn.net/LeeGe666/article/details/106604378)
 知乎：[https://zhuanlan.zhihu.com/p/146489438](https://zhuanlan.zhihu.com/p/146489438)
 
-下载地址：[https://www.aysst.cn/files/配音助手1.2.zip](https://www.aysst.cn/files/%E9%85%8D%E9%9F%B3%E5%8A%A9%E6%89%8B1.2.zip)
+**配音助手下载地址**：
+[蓝奏云 配音助手1.3.zip](https://nh4l.lanzous.com/iZVDSg5kccf)
+[微云   配音助手1.3.zip](https://share.weiyun.com/kddB9ikC)
+[自建服务器 配音助手1.3.zip](https://www.aysst.cn/files/%E9%85%8D%E9%9F%B3%E5%8A%A9%E6%89%8B1.3.zip)
+
+>**声明**
+>本软件只适用于配音者，视频制作者
+>不适用于超大规模（10万字以上）超长文本配音
+>本软件完全开源并免费，商用产生费用为阿里云根据合成字数及时长产生，和本软件无关
+>
+
+## 更新内容（1.3）[windows 10 2004版本及以下]
+#### 1、增加商用音色功能（每次合成<10万字，10分钟内生成）
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828205558298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
+所加音色为**长文本语音合成商用**！非商用音色免费！
+具体价格细节可查看阿里云
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828205812909.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
+
+下面介绍如果开通商用：
+进入**智能语音交互控制台**
+选择长文本语音合成（文学类为商用，音色只能应用于长文本）
+点击**服务开通与购买**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828210147641.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
+全部选择商用开通即可，**不使用不会产生费用**！
+**不建议购买时长包，生成过程中产生多少费用支付即可！大规模使用者可能会产生较多费用，普通用户不建议开通（使用不慎可产生大量费用）**！
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200828210343321.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70#pic_center)
+
+
 ## 更新内容（1.2）[windows 10 2004版本及以下]
 #### 1、解决window10 2004版本卡死问题
 原因：2004版本将底层适配包更新，所以qt官方也将底层更新，包重新适配。由于我是上一代版本qt，对2004不兼容，造成前遇到弹窗卡死的情况。
 
 解决：更新开发包，发现新的开发环境下不能使用原有代码，因为子线程不能独立拥有弹窗，于是利用Signal将信号传递到主线程中使用，不发生卡死现象。
-
 
 ## 更新内容（1.1）[windows 10 1909版本及以下]
 
@@ -41,53 +67,7 @@ csdn: [https://blog.csdn.net/LeeGe666/article/details/106604378](https://blog.cs
 #### 6、修复点击音频合成会一直卡住的bug
 原因为日志生成代码出错，导致音频文件已经合成，但得不到提示，需重启才可以重新运行。
 
-
-## 一、软件介绍
-意外发现阿里云语音合成效果非常不错，且某些音色非常真实好听，应网友要求，特意为没有代码方面经验的朋友制作了这款软件，方便大家更好的进行配音以及其他使用。
-
-
-本软件基于pyqyt5绘制GUI，基于爬虫获取阿里云语音合成API，由于阿里云官方免费版有300字数限制，本软件利用标点符号（句号。）和限制字数构造了一种文本句子切割算法，将切割下来的字符分别进行语音合成，突破阿里云语音合成字数限制。
-使用本软件前先查看博客
-csdn：[https://blog.csdn.net/LeeGe666/article/details/105353599](https://blog.csdn.net/LeeGe666/article/details/105353599)
-知乎：[https://zhuanlan.zhihu.com/p/123930042](https://zhuanlan.zhihu.com/p/123930042)
-
-根据博客中教程，注册阿里云账户，创建智能语音交互项目，获取appkey和token。
-
-## 二、软件使用
-下载**配音助手.zip**，解压(解压路劲随意)后打开**配音助手.exe**,切勿删除该目录下的图片，图片为桌面显示图标，删除后软件不弄运行。
-
-#### 2.1 语音合成页
-采用半透明设计，左上角三个点依次为**最小化**，**最大化**，**关闭**，
-输入框中的参数从第一步得到并填入，最后根据自身需求更改参数后即可进行语音合成。
-音色选择可以点击配音试听，跳转到阿里云官网中试听，选择自己需要的配音音色，即可进行音频合成。
-下载好的文件在当前目录的**audioFiles目录**下
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607170425534.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-
-
-#### 2.2 使用说明
-点击第二个使用说明即可到达该页
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607171522900.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-#### 2.3 下载管理
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607171731670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-点击打开后，即打开下载文件所在目录
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607171835411.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-#### 2.4 反馈建议
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020060717191840.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-#### 2.5 关于我们
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607171954410.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-#### 2.6 遇到问题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200607172026498.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0xlZUdlNjY2,size_16,color_FFFFFF,t_70)
-## 三、总结
-由于时间原因，没有开发该软件对应的网站，本软件为免费软件，不收取任何费用，若遇到bug可以私信或者发送bug到邮箱中。
-本软件也不会获取用户信息，只有下载音频的时候才会用到网络，请放心使用，若使用中有任何建议，请私信或邮箱。
-
-
-
 **感谢**：@南宫涵， @梦想拉长了身影，等网友的反馈与建议
 
 **github**开源: [https://github.com/NH4L/voiceAssistant ](https://github.com/NH4L/voiceAssistant)
-
 
